@@ -5,5 +5,8 @@
  */
 class Writer
 {
-	
+	public static function addOrUpdate($data)
+	{
+		print_r($data);
+	}
 }
