@@ -20,6 +20,8 @@ define('LOGS', CORE.'/logs');
 define('PARSER_LOGS', LOGS.'/'.PARSER_NAME);
 define('PARSER_RESOURCES', PARSERS.'/'.PARSER_NAME);
 define('COMPOSER', CORE.'/vendor/autoload.php');
+define('TOKEN', 'z11a6Hvs6uShBuzxFGM1');
+define('BITRIX', 'http://bitrix-site.loc/26b8zNbvmDFkLBleFxwU.php');
 
 spl_autoload_register(function ($class) {
 	require CLASSES.'/'.$class.'.class.php';

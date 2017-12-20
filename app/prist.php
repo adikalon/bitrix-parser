@@ -18,9 +18,30 @@ $options = [
 	]
 ];
 
+$brands = [];
+
+// Наполнение массива $brands
+function getBrands($link) {
+	global $pause, $options, $brands;
+	$brands = [];
+	$html = Request::curl($link, $pause, $options);
+	$html = iconv('windows-1251', 'utf-8', $html);
+	$dom = phpQuery::newDocument($html)->find('a.o');
+	foreach ($dom as $a) {
+		$brand = trim(pq($a)->text());
+		if (!in_array($brand, $brands) and $brand != 'Прочие') {
+			$brands[] = $brand;
+		}
+		unset($a, $brand);
+	}
+	$dom->unloadDocument();
+	unset($link, $html, $dom);
+}
+
 // Список основного оглавления раздела
 function getHeaders($link) {
 	global $pause, $options;
+	getBrands($link);
 	$html = Request::curl($link, $pause, $options);
 	$html = iconv('windows-1251', 'utf-8', $html);
 	$dom = phpQuery::newDocument($html);
@@ -65,6 +86,7 @@ function getPrice($dom) {
 		unset($price, $matchStock, $matchNDS);
 		return [
 			'num' => 0,
+			'disc' => 0,
 			'str' => 'По запросу'
 		];
 	} elseif (!empty($matchStock['c']) and !empty($matchStock['s'])) {
@@ -74,7 +96,8 @@ function getPrice($dom) {
 			$s = (int)str_replace(' ', '', $matchStock['s']);
 			unset($price, $matchStock, $matchNDS);
 			return [
-				'num' => $c,
+				'num' => $s,
+				'disc' => $s - $c,
 				'str' => "С НДС: $s. На складе: $c"
 			];
 		}
@@ -84,12 +107,14 @@ function getPrice($dom) {
 		unset($price, $matchStock, $matchNDS);
 		return [
 			'num' => $c,
+			'disc' => 0,
 			'str' => "С НДС: $c"
 		];
 	} else {
 		unset($price, $matchStock, $matchNDS);
 		return [
 			'num' => 0,
+			'disc' => 0,
 			'str' => 'Неизвестно'
 		];
 	}
@@ -111,7 +136,7 @@ function getGuarantee($dom) {
 function getData($dom) {
 	$data = $dom->find('#main')->html();
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/>\s+/', '/\s+</', '/\s{2,}/'], ['>', '<', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
 	return $data;
 }
 
@@ -119,8 +144,23 @@ function getData($dom) {
 function getAdditionally($dom) {
 	$data = $dom->find('#descr')->html();
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/>\s+/', '/\s+</', '/\s{2,}/'], ['>', '<', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
 	return $data;
+}
+
+// Производитель
+function getManufacturer($dom) {
+	global $brands;
+	$data = $dom->find("p[style='text-align: justify;']")->text();
+	foreach ($brands as $brand) {
+		if (strpos($data, $brand) !== false) {
+			unset($data);
+			return $brand;
+		}
+		unset($brand);
+	}
+	unset($data);
+	return '';
 }
 
 // Изображения
@@ -144,28 +184,53 @@ function getImages($dom) {
 	return $images;
 }
 
+// Артикуль товара
+function getCode($link) {
+	preg_match('/.*id=(?<code>\d+)[^\d]?.*/', $link, $match);
+	return $match['code'];
+}
+
 // Разбор страницы товара
 function parseGood($link, $title) {
 	global $pause, $options;
 	$html = Request::curl($link, $pause, $options);
 	$html = iconv('windows-1251', 'utf-8', $html);
 	$dom = phpQuery::newDocument($html);
-	Writer::addOrUpdate([
+	$name = trim($dom->find('h1.card>span')->text());
+	$data = [
 		'link' => $link,
+		'code' => getCode($link),
 		'tab' => getTab($dom),
 		'section' => $title,
 		'subsection' => getSubsection($dom),
-		'name' => trim($dom->find('h1.card>span')->text()),
+		'name' => $name,
 		'priceNum' => getPrice($dom)['num'],
+		'discount' => getPrice($dom)['disc'],
 		'priceStr' => getPrice($dom)['str'],
 		'guarantee' => getGuarantee($dom),
 		'data' => getData($dom),
 		'additionally' => getAdditionally($dom),
+		'manufacturer' => getManufacturer($dom),
 		'images' => getImages($dom),
-	]);
-	Logger::send('|ТОВАР| - Товар: "'.$title.'" добавлен.'); // Поменять $title на название товара
+	];
+	$data = json_encode($data);
+	$params = [
+		CURLOPT_POST => true,
+		CURLOPT_POSTFIELDS => "data=$data&token=".TOKEN
+	];
+	$response = Request::curl(BITRIX, $pause, $params);
+	switch ($response) {
+		case 1:
+			Logger::send('|ТОВАР| - Товар: "'.$name.'" добавлен.');
+			break;
+		case 2:
+			Logger::send('|ТОВАР| - Товар: "'.$name.'" обновлен.');
+			break;
+		default:
+			Logger::send('|ТОВАР| - Товар: "'.$name.'" не добавлен. Неизвестная ошибка.');
+	}
 	$dom->unloadDocument();
-	unset($link, $title, $html, $dom);
+	unset($link, $title, $html, $dom, $data, $params, $response);
 }
 
 // Проверка на последнюю страницу
