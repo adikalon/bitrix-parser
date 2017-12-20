@@ -135,6 +135,7 @@ function getGuarantee($dom) {
 // Основные данные
 function getData($dom) {
 	$data = $dom->find('#main')->html();
+	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
 	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
 	return $data;
@@ -143,6 +144,7 @@ function getData($dom) {
 // Дополнительно
 function getAdditionally($dom) {
 	$data = $dom->find('#descr')->html();
+	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
 	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
 	return $data;

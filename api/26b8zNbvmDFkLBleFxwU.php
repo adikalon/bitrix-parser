@@ -196,8 +196,6 @@ function createOrUpdateRecord($data, $id) {
 if (CModule::IncludeModule('iblock')) {
 	
 	$data = json_decode($_POST['data']);
-	$data->image = $data->images[0];
-
 	$tabId = createOrUpdateSection($data->tab);
 	$sectionId = createOrUpdateSection($data->section, $tabId);
 	$subsectionId = createOrUpdateSection($data->subsection, $sectionId);
