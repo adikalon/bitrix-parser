@@ -105,8 +105,7 @@ function addGood($data, $id) {
 		'DISCOUNT' => $data->discount,
 		'CURRENCY' => '1',
 		'QUANTITY' => '1',
-		'BRAND' => $data->manufacturer,
-		'TYPE' => $data->subsection,
+		'BRAND' => $data->manufacturer
 	];
 	$options = [
 		'MODIFIED_BY' => 1,
@@ -143,8 +142,7 @@ function updateGood($data, $ident, $id) {
 		'DISCOUNT' => $data->discount,
 		'CURRENCY' => '1',
 		'QUANTITY' => '1',
-		'BRAND' => $data->manufacturer,
-		'TYPE' => $data->subsection,
+		'BRAND' => $data->manufacturer
 	];
 	if (count($data->images) > 1) {
 		$properties['MORE_PHOTO'] = getImages($data);
