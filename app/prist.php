@@ -80,9 +80,10 @@ function getTab($dom) {
 // Цена
 function getPrice($dom) {
 	$price = $dom->find('p:contains("Цена")')->parent()->html();
+	$price = str_replace(' ', '', $price);
 	preg_match('/.*<p.*<s>.*[^\d](?<s>\d+)[^\d].*<\/s>.*red.*[^\d](?<c>\d+)[^\d].*p>.*/', $price, $matchStock);
 	preg_match('/.*<p.*[^\d](?<c>\d+)[^\d].*p>.*/', $price, $matchNDS);
-	if (stristr($price, 'по запросу') !== false) {
+	if (stristr($price, 'позапросу') !== false) {
 		unset($price, $matchStock, $matchNDS);
 		return [
 			'num' => 0,
@@ -90,10 +91,9 @@ function getPrice($dom) {
 			'str' => 'По запросу'
 		];
 	} elseif (!empty($matchStock['c']) and !empty($matchStock['s'])) {
-		$price = str_replace(' ', '', $price);
-		if (stristr($price, 'Цена на товар на складе') !== false) {
-			$c = (int)str_replace(' ', '', $matchStock['c']);
-			$s = (int)str_replace(' ', '', $matchStock['s']);
+		if (stristr($price, 'Ценанатоварнаскладе') !== false) {
+			$c = (int)$matchStock['c'];
+			$s = (int)$matchStock['s'];
 			unset($price, $matchStock, $matchNDS);
 			return [
 				'num' => $s,
@@ -102,8 +102,7 @@ function getPrice($dom) {
 			];
 		}
 	} elseif (!empty($matchNDS['c'])) {
-		$price = str_replace(' ', '', $price);
-		$c = (int)str_replace(' ', '', $matchNDS['c']);
+		$c = (int)$matchNDS['c'];
 		unset($price, $matchStock, $matchNDS);
 		return [
 			'num' => $c,
@@ -135,18 +134,20 @@ function getGuarantee($dom) {
 // Основные данные
 function getData($dom) {
 	$data = $dom->find('#main')->html();
+	$data = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/'], ['', '', ' '], $data);
 	return $data;
 }
 
 // Дополнительно
 function getAdditionally($dom) {
 	$data = $dom->find('#descr')->html();
+	$data = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/<a>/','/<\/a>/', '/>\s+/', '/\s+</', '/\s{2,}/'], ['', '', '>', '<', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/'], ['', '', ' '], $data);
 	return $data;
 }
 
