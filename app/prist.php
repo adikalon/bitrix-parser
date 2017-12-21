@@ -64,6 +64,7 @@ function getSubsection($dom) {
 	$subsections = $dom->find('a[href^=/produce/e-cat/]');
 	$current = count($subsections)-1;
 	$subsection = trim($subsections->eq($current)->text());
+	$subsection = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', ' ', $subsection);
 	unset($subsections, $current);
 	return $subsection;
 }
@@ -73,6 +74,7 @@ function getTab($dom) {
 	$tabs = $dom->find('a[href^=/produce/prices/]');
 	$current = count($tabs)-1;
 	$tab = trim($tabs->eq($current)->text());
+	$tab = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', ' ', $tab);
 	unset($tabs, $current);
 	return $tab;
 }
@@ -158,6 +160,7 @@ function getManufacturer($dom) {
 	foreach ($brands as $brand) {
 		if (strpos($data, $brand) !== false) {
 			unset($data);
+			$brand = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', ' ', $brand);
 			return $brand;
 		}
 		unset($brand);

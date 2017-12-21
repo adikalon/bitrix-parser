@@ -86,7 +86,6 @@ function isGood($code/*, $id*/) {
 
 // Дополнительные изображения
 function getImages($data) {
-	unset($data->images[0]);
 	$images = [];
 	foreach ($data->images as $image) {
 		$images[] = [
@@ -94,6 +93,7 @@ function getImages($data) {
 			'DESCRIPTION' => $data->name
 		];
 	}
+	unset($images[0]);
 	return $images;
 }
 
@@ -111,7 +111,7 @@ function addGood($data, $id) {
 		'MODIFIED_BY' => 1,
 		'IBLOCK_SECTION_ID' => $id,
 		'IBLOCK_ID' => 1,
-		'CODE' => code($data->name),
+		'CODE' => $data->code,
 		'PROPERTY_VALUES'=> $properties,
 		'NAME' => $data->name,
 		'ACTIVE' => 'Y',
@@ -154,7 +154,7 @@ function updateGood($data, $ident, $id) {
 		'MODIFIED_BY' => 1,
 		'IBLOCK_SECTION_ID' => $id,
 		'IBLOCK_ID' => 1,
-		'CODE' => code($data->name),
+		'CODE' => $data->code,
 		'PROPERTY_VALUES'=> $properties,
 		'NAME' => $data->name,
 		'ACTIVE' => 'Y',
