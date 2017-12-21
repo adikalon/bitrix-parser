@@ -144,11 +144,10 @@ function updateGood($data, $ident, $id) {
 		'QUANTITY' => '1',
 		'BRAND' => $data->manufacturer
 	];
+	$prop['MORE_PHOTO'] = ['VALUE' => false];
+	CIBlockElement::SetPropertyValuesEx($ident, false, $prop);
 	if (count($data->images) > 1) {
 		$properties['MORE_PHOTO'] = getImages($data);
-	} else {
-		$prop['MORE_PHOTO'] = ['VALUE' => false];
-		CIBlockElement::SetPropertyValuesEx($ident, false, $prop);
 	}
 	$options = [
 		'MODIFIED_BY' => 1,
