@@ -105,7 +105,8 @@ function addGood($data, $id) {
 		'DISCOUNT' => $data->discount,
 		'CURRENCY' => '1',
 		'QUANTITY' => '1',
-		'BRAND' => $data->manufacturer
+		'BRAND' => $data->manufacturer,
+		'TYPE' => $data->subsection
 	];
 	$options = [
 		'MODIFIED_BY' => 1,
@@ -142,7 +143,8 @@ function updateGood($data, $ident, $id) {
 		'DISCOUNT' => $data->discount,
 		'CURRENCY' => '1',
 		'QUANTITY' => '1',
-		'BRAND' => $data->manufacturer
+		'BRAND' => $data->manufacturer,
+		'TYPE' => $data->subsection
 	];
 	$prop['MORE_PHOTO'] = ['VALUE' => false];
 	CIBlockElement::SetPropertyValuesEx($ident, false, $prop);
