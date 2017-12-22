@@ -192,7 +192,7 @@ function getImages($dom) {
 
 // Артикуль товара
 function getCode($link) {
-	preg_match('/.*id=(?<code>\d+)[^\d]?.*/', $link, $match);
+	preg_match('/.*id=-?(?<code>\d+)[^\d]?.*/', $link, $match);
 	return $match['code'];
 }
 
