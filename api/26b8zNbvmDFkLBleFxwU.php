@@ -196,8 +196,8 @@ if (CModule::IncludeModule('iblock')) {
 	$data = json_decode($_POST['data']);
 	$tabId = createOrUpdateSection($data->tab);
 	$sectionId = createOrUpdateSection($data->section, $tabId);
-	$subsectionId = createOrUpdateSection($data->subsection, $sectionId);
-	echo createOrUpdateRecord($data, $subsectionId);
+	//$subsectionId = createOrUpdateSection($data->subsection, $sectionId);
+	echo createOrUpdateRecord($data, $sectionId);
 } else {
 	error();
 }
