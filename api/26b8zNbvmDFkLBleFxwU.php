@@ -108,6 +108,9 @@ function addGood($data, $id) {
 		'BRAND' => $data->manufacturer,
 		'TYPE' => $data->subsection
 	];
+	if (count($data->images) > 1) {
+		$properties['MORE_PHOTO'] = getImages($data);
+	}
 	$options = [
 		'MODIFIED_BY' => 1,
 		'IBLOCK_SECTION_ID' => $id,
@@ -121,9 +124,6 @@ function addGood($data, $id) {
 		'PREVIEW_TEXT_TYPE' => 'html',
 		'DETAIL_TEXT_TYPE' => 'html',
 	];
-	if (count($data->images) > 1) {
-		$properties['MORE_PHOTO'] = getImages($data);
-	}
 	if (!empty($data->images[0])) {
 		$options['PREVIEW_PICTURE'] = CIBlock::ResizePicture(CFile::MakeFileArray($data->images[0]), [
 			'WIDTH' => 300,

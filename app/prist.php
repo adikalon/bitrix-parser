@@ -4,7 +4,7 @@ require __DIR__.'/../core.php';
 
 Logger::send("|СТАРТ| - Скрипт запущен. Парсинг из ".PARSER_NAME);
 
-$pause = 10;
+$pause = 3;
 $options = [
 	CURLOPT_HTTPHEADER => [
 		"Host: prist.ru",
