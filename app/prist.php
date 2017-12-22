@@ -139,7 +139,7 @@ function getData($dom) {
 	$data = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/'], ['', '', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/', '/gt;/', '/lt;/'], ['', '', ' ', '>', '<'], $data);
 	return $data;
 }
 
@@ -149,7 +149,7 @@ function getAdditionally($dom) {
 	$data = preg_replace('/[^\d\w\s\.,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
-	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/'], ['', '', ' '], $data);
+	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/', '/gt;/', '/lt;/'], ['', '', ' ', '>', '<'], $data);
 	return $data;
 }
 
@@ -201,6 +201,7 @@ function parseGood($link, $title) {
 	global $pause, $options;
 	$html = Request::curl($link, $pause, $options);
 	$html = iconv('windows-1251', 'utf-8', $html);
+	$html = preg_replace(['/(>[^<])(>)/ui', '/(<)([^>]+<)/ui'], ['$1&gt;', '&lt;$2'], $html);
 	$dom = phpQuery::newDocument($html);
 	$name = trim($dom->find('h1.card>span')->text());
 	$data = [
