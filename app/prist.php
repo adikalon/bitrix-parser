@@ -137,7 +137,7 @@ function getGuarantee($dom) {
 function getData($dom) {
 	$data = $dom->find('#main')->html();
 	$data = str_replace('%', '% ', $data);
-	$data = preg_replace('/[^\d\w\s\.\…,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
+	$data = preg_replace('/[^\d\w\s\.\…,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}="\'±°µ]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
 	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/', '/gt;/', '/lt;/'], ['', '', ' ', '>', '<'], $data);
@@ -148,10 +148,29 @@ function getData($dom) {
 function getAdditionally($dom) {
 	$data = $dom->find('#descr')->html();
 	$data = str_replace('%', '% ', $data);
-	$data = preg_replace('/[^\d\w\s\.\…,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}]/u', '', $data);
+	$data = preg_replace('/[^\d\w\s\.\…,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}="\'±°µ]/u', '', $data);
 	$data = preg_replace('/<table.*\/table>/uis', '', $data);
 	$data = preg_replace('/(<\/?\w+)(?:\s(?:[^<>\/]|\/[^<>])*)?(\/?>)/ui', '$1$2', $data);
 	$data = preg_replace(['/<a>/','/<\/a>/', '/\s{2,}/', '/gt;/', '/lt;/'], ['', '', ' ', '>', '<'], $data);
+	return $data;
+}
+
+// Таблица характеристик
+function getDataTable($dom) {
+	$res = '';
+	$data = $dom->find('#main>table');
+	if (count($data) < 1) {
+		unset($data, $res);
+		return '';
+	}
+	foreach ($data as $table) {
+		$res .= '<br><table class="ttd">'.pq($table)->html().'</table>';
+	}
+	$data = $res;
+	unset($res);
+	$data = str_replace('%', '% ', $data);
+	$data = preg_replace('/[^\d\w\s\.\…,:\?\!<>\(\)\-\+\$\*\^\/\@\;\#\%\[\]\{\}="\'±°µ]/u', '', $data);
+	$data = preg_replace(['/<a[^<]*>/','/<\/a>/', '/\s{2,}/', '/gt;/', '/lt;/'], ['', '', ' ', '>', '<'], $data);
 	return $data;
 }
 
@@ -218,7 +237,7 @@ function parseGood($link, $title) {
 		'priceStr' => getPrice($dom)['str'],
 		'guarantee' => getGuarantee($dom),
 		'data' => getData($dom),
-		'additionally' => getAdditionally($dom),
+		'additionally' => getAdditionally($dom).getDataTable($dom),
 		'manufacturer' => getManufacturer($dom),
 		'images' => getImages($dom),
 	];
