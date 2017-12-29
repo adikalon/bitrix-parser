@@ -103,7 +103,7 @@ function addGood($data, $id) {
 		'CML2_ARTICLE' => $data->code,
 		'PRICE' => $data->priceNum,
 		'DISCOUNT' => $data->discount,
-		'CURRENCY' => '1',
+		'CURRENCY' => $data->currency,
 		'QUANTITY' => '1',
 		'BRAND' => $data->manufacturer,
 		'TYPE' => $data->subsection
@@ -141,7 +141,7 @@ function updateGood($data, $ident, $id) {
 		'CML2_ARTICLE' => $data->code,
 		'PRICE' => $data->priceNum,
 		'DISCOUNT' => $data->discount,
-		'CURRENCY' => '1',
+		'CURRENCY' => $data->currency,
 		'QUANTITY' => '1',
 		'BRAND' => $data->manufacturer,
 		'TYPE' => $data->subsection

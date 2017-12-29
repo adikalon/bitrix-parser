@@ -82,14 +82,22 @@ function getTab($dom) {
 // Цена
 function getPrice($dom) {
 	$price = $dom->find('p:contains("Цена")')->parent()->html();
+	$currency = $dom->find('p:contains("Цена")')->parent()->text();
+	$currency = str_replace(' ', '', $currency);
+	if (preg_match('/.*\d+\D\s*\$.*/u', $currency)) {
+		$currency = '2';
+	} else {
+		$currency = '1';
+	}
 	$price = str_replace(' ', '', $price);
 	preg_match('/.*<p.*<s>.*[^\d](?<s>\d+)[^\d].*<\/s>.*red.*[^\d](?<c>\d+)[^\d].*p>.*/', $price, $matchStock);
 	preg_match('/.*<p.*[^\d](?<c>\d+)[^\d].*p>.*/', $price, $matchNDS);
 	if (stristr($price, 'позапросу') !== false) {
-		unset($price, $matchStock, $matchNDS);
+		unset($price, $currency, $matchStock, $matchNDS);
 		return [
 			'num' => 0,
 			'disc' => 0,
+			'currency' => '1',
 			'str' => 'По запросу'
 		];
 	} elseif (!empty($matchStock['c']) and !empty($matchStock['s'])) {
@@ -100,6 +108,7 @@ function getPrice($dom) {
 			return [
 				'num' => $s,
 				'disc' => $s - $c,
+				'currency' => $currency,
 				'str' => "С НДС: $s. На складе: $c"
 			];
 		}
@@ -109,13 +118,15 @@ function getPrice($dom) {
 		return [
 			'num' => $c,
 			'disc' => 0,
+			'currency' => $currency,
 			'str' => "С НДС: $c"
 		];
 	} else {
-		unset($price, $matchStock, $matchNDS);
+		unset($price, $currency, $matchStock, $matchNDS);
 		return [
 			'num' => 0,
 			'disc' => 0,
+			'currency' => '1',
 			'str' => 'Неизвестно'
 		];
 	}
@@ -235,6 +246,7 @@ function parseGood($link, $title) {
 		'priceNum' => getPrice($dom)['num'],
 		'discount' => getPrice($dom)['disc'],
 		'priceStr' => getPrice($dom)['str'],
+		'currency' => getPrice($dom)['currency'],
 		'guarantee' => getGuarantee($dom),
 		'data' => getData($dom),
 		'additionally' => getAdditionally($dom).getDataTable($dom),
