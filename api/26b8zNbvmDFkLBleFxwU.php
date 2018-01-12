@@ -108,6 +108,9 @@ function addGood($data, $id) {
 		'BRAND' => $data->manufacturer,
 		'TYPE' => $data->subsection
 	];
+	if ($data->priceNum < 1) {
+		$properties['CURRENCY'] = 0;
+	}
 	if (count($data->images) > 1) {
 		$properties['MORE_PHOTO'] = getImages($data);
 	}
@@ -143,26 +146,30 @@ function updateGood($data, $ident, $id) {
 		'DISCOUNT' => $data->discount,
 		'CURRENCY' => $data->currency,
 		'QUANTITY' => '1',
-		'BRAND' => $data->manufacturer,
-		'TYPE' => $data->subsection
+		//'BRAND' => $data->manufacturer,
+		//'TYPE' => $data->subsection
 	];
+	if ($data->priceNum < 1) {
+		$properties['CURRENCY'] = 0;
+	}
 	$prop['MORE_PHOTO'] = ['VALUE' => false];
 	CIBlockElement::SetPropertyValuesEx($ident, false, $prop);
 	if (count($data->images) > 1) {
 		$properties['MORE_PHOTO'] = getImages($data);
 	}
+	CIBlockElement::SetPropertyValuesEx($ident, false, $properties);
 	$options = [
 		'MODIFIED_BY' => 1,
 		'IBLOCK_SECTION_ID' => $id,
 		'IBLOCK_ID' => 1,
 		'CODE' => $data->code,
-		'PROPERTY_VALUES'=> $properties,
+		//'PROPERTY_VALUES'=> $properties,
 		'NAME' => $data->name,
 		'ACTIVE' => 'Y',
-		'PREVIEW_TEXT' => $data->data,
-		'DETAIL_TEXT' => $data->additionally,
-		'PREVIEW_TEXT_TYPE' => 'html',
-		'DETAIL_TEXT_TYPE' => 'html',
+		//'PREVIEW_TEXT' => $data->data,
+		//'DETAIL_TEXT' => $data->additionally,
+		//'PREVIEW_TEXT_TYPE' => 'html',
+		//'DETAIL_TEXT_TYPE' => 'html',
 	];
 	if (!empty($data->images[0])) {
 		$options['PREVIEW_PICTURE'] = CIBlock::ResizePicture(CFile::MakeFileArray($data->images[0]), [
