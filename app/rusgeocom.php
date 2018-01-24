@@ -79,8 +79,6 @@ function categories() {
 
 // Отправка товара на запись
 function write($data) {
-	 var_dump($data);
-	 return null;
 	global $pause;
 	$name = $data['name'];
 	$data = json_encode($data);
