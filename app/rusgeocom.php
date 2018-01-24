@@ -4,7 +4,7 @@ require __DIR__.'/../core.php';
 
 Logger::send("|СТАРТ| - Скрипт запущен. Парсинг из ".PARSER_NAME);
 
-$pause = 0;
+$pause = 3;
 $options = [
 	CURLOPT_HTTPHEADER => [
 		"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
@@ -79,6 +79,8 @@ function categories() {
 
 // Отправка товара на запись
 function write($data) {
+	 var_dump($data);
+	 return null;
 	global $pause;
 	$name = $data['name'];
 	$data = json_encode($data);
@@ -273,8 +275,9 @@ function good($link) {
 	$dom = phpQuery::newDocument($html);
 	unset($html);
 	$breadcrumbs = trim(mb_strtolower($dom->find('a.breadcrumbs-new__link')->text()));
-	if (stristr($breadcrumbs, 'б/у') !== false or stristr($breadcrumbs, 'уцененные товары') !== false) {
-		unset($breadcrumbs);
+	if (stristr($breadcrumbs, 'б/у') !== false or stristr($breadcrumbs, 'уцененные товары') !== false or count($dom->find('a.breadcrumbs-new__link')) < 3) {
+		$dom->unloadDocument();
+		unset($breadcrumbs, $dom, $link);
 		return null;
 	}
 	unset($breadcrumbs);
