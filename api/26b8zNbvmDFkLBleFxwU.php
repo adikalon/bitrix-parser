@@ -226,7 +226,7 @@ function findByName($name) {
 
 if (CModule::IncludeModule('iblock')) {
 	$data = json_decode($_POST['data']);
-	$data->name = urldecode($data->name);
+	$data->name = htmlentities(urldecode($data->name));
 	if (stristr(mb_strtolower($data->code), 'rgc') !== false) {
 		$good = findByName($data->name);
 		if ($good !== false and is_array($good)) {
