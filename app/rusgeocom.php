@@ -80,7 +80,7 @@ function categories() {
 // Отправка товара на запись
 function write($data) {
 	global $pause;
-	$name = $data['name'];
+	$name = urldecode($data['name']);
 	$data = json_encode($data);
 	$params = [
 		CURLOPT_POST => true,
@@ -258,7 +258,7 @@ function getManufacturer($obj) {
 // Имя
 function getName($obj) {
 	$count = count($obj->find('a.breadcrumbs-new__link')) - 1;
-	return trim($obj->find('a.breadcrumbs-new__link')->eq($count)->text());
+	return urlencode(trim($obj->find('a.breadcrumbs-new__link')->eq($count)->text()));
 }
 
 // Разбор страницы товара
