@@ -70,16 +70,21 @@ function createOrUpdateSection($name, $id = 0) {
 }
 
 // Проверка на существование записи и возврат ее id в случае наличия
-function isGood($code/*, $id*/) {
+function isGood($data) {
 	$filter = [
 		//'SECTION_ID' => $id,
-		'PROPERTY_1' => $code,
+		'PROPERTY_1' => $data->code,
 		'ACTIVE' => 'Y'
 	];
 	$good = CIBlockElement::GetList([], $filter, false, ['nPageSize' => 1]);
 	if (!$good->arResult) {
 		return false;
 	} else {
+		if (stristr(mb_strtolower($data->code), 'rgc') === false and stristr(mb_strtolower($good->arResult[0]['CODE']), 'rgc') !== false) {
+			// Не обновляем по приоритетам
+			echo 3;
+			exit;
+		}
 		return (int)$good->arResult[0]['ID'];
 	}
 }
@@ -184,7 +189,7 @@ function updateGood($data, $ident, $id) {
 
 // Создание или обновление записи и получение информации
 function createOrUpdateRecord($data, $id) {
-	$ident = isGood($data->code, $id);
+	$ident = isGood($data);
 	if (!$ident) {
 		$res = addGood($data, $id);
 		if (is_numeric($res)) {
@@ -201,8 +206,37 @@ function createOrUpdateRecord($data, $id) {
 	}
 }
 
+// Поиск по имени
+function findByName($name) {
+	$filter = [
+		'NAME' => $name,
+		'ACTIVE' => 'Y'
+	];
+	$good = CIBlockElement::GetList([], $filter, false, ['nPageSize' => 1]);
+	if (!$good->arResult) {
+		return false;
+	} else {
+		return [
+			'id' => (int)$good->arResult[0]['ID'],
+			'section' => (int)$good->arResult[0]['IBLOCK_SECTION_ID']
+		];
+		return (int)$good->arResult[0]['ID'];
+	}
+}
+
 if (CModule::IncludeModule('iblock')) {
 	$data = json_decode($_POST['data']);
+	if (stristr(mb_strtolower($data->code), 'rgc') !== false) {
+		$good = findByName($data->name);
+		if ($good !== false and is_array($good)) {
+			if (updateGood($data, $good['id'], $good['section'])) {
+				echo 2;
+			} else {
+				echo 'error';
+			}
+			exit;
+		}
+	}
 	$tabId = createOrUpdateSection($data->tab);
 	$sectionId = createOrUpdateSection($data->section, $tabId);
 	//$subsectionId = createOrUpdateSection($data->subsection, $sectionId);

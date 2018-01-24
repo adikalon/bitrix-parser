@@ -266,6 +266,9 @@ function parseGood($link, $title) {
 		case 2:
 			Logger::send('|ТОВАР| - Товар: "'.$name.'" обновлен.');
 			break;
+		case 3:
+			Logger::send('|ТОВАР| - Товар: "'.$name.'" не обновлен из-за приоритетов.');
+			break;
 		default:
 			Logger::send('|ТОВАР| - Товар: "'.$name.'" не добавлен. Неизвестная ошибка.');
 	}
