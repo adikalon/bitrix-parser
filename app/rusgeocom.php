@@ -127,18 +127,17 @@ function getCode($obj) {
 
 // Раздел
 function getTab($obj) {
-	return trim($obj->find('a.breadcrumbs-new__link')->eq(0)->text());
+	return trim($obj->find('li.show')->eq(0)->find('a')->eq(0)->text());
 }
 
 // Секция
 function getSection($obj) {
-	return trim($obj->find('a.breadcrumbs-new__link')->eq(1)->text());
+	return trim($obj->find('div.catalog-filter-title')->eq(0)->text());
 }
 
 // Подзаголовок
 function getSubsection($obj) {
-	$count = count($obj->find('a.breadcrumbs-new__link')) - 2;
-	return trim($obj->find('a.breadcrumbs-new__link')->eq($count)->text());
+	return trim($obj->find('div.catalog-filter-link')->eq(0)->find('a.active')->eq(0)->text());
 }
 
 // Цена
@@ -257,8 +256,13 @@ function getManufacturer($obj) {
 
 // Имя
 function getName($obj) {
+	return urlencode(str_replace('"', '\"', trim($obj->find('div.product-cart__title')->eq(0)->text())));
+}
+
+// Альтернативное имя
+function getAltName($obj) {
 	$count = count($obj->find('a.breadcrumbs-new__link')) - 1;
-	return urlencode(trim($obj->find('a.breadcrumbs-new__link')->eq($count)->text()));
+	return urlencode(str_replace('"', '\"', trim($obj->find('a.breadcrumbs-new__link')->eq($count)->text())));
 }
 
 // Разбор страницы товара
@@ -273,7 +277,7 @@ function good($link) {
 	$dom = phpQuery::newDocument($html);
 	unset($html);
 	$breadcrumbs = trim(mb_strtolower($dom->find('a.breadcrumbs-new__link')->text()));
-	if (stristr($breadcrumbs, 'б/у') !== false or stristr($breadcrumbs, 'уцененные товары') !== false or count($dom->find('a.breadcrumbs-new__link')) < 3) {
+	if (stristr($breadcrumbs, 'б/у') !== false or stristr($breadcrumbs, 'уцененные товары') !== false) {
 		$dom->unloadDocument();
 		unset($breadcrumbs, $dom, $link);
 		return null;
@@ -286,6 +290,7 @@ function good($link) {
 		'section' => getSection($dom),
 		'subsection' => getSubsection($dom),
 		'name' => getName($dom),
+		'altName' => getAltName($dom),
 		'priceNum' => getPrice($dom)['num'],
 		'discount' => getPrice($dom)['disc'],
 		'priceStr' => 'Отсутствует',

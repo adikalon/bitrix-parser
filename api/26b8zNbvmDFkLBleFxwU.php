@@ -226,9 +226,12 @@ function findByName($name) {
 
 if (CModule::IncludeModule('iblock')) {
 	$data = json_decode($_POST['data']);
-	$data->name = htmlentities(urldecode($data->name));
+	$data->name = urldecode($data->name);
+	$data->altName = urldecode($data->altName);
+	$data->data = str_replace('amp;', '&', $data->data);
+	$data->additionally = str_replace('amp;', '&', $data->additionally);
 	if (stristr(mb_strtolower($data->code), 'rgc') !== false) {
-		$good = findByName($data->name);
+		$good = findByName($data->altName);
 		if ($good !== false and is_array($good)) {
 			if (updateGood($data, $good['id'], $good['section'])) {
 				echo 2;

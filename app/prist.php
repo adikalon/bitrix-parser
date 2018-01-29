@@ -243,6 +243,7 @@ function parseGood($link, $title) {
 		'section' => $title,
 		'subsection' => getSubsection($dom),
 		'name' => urlencode($name),
+		'altName' => urlencode($name),
 		'priceNum' => getPrice($dom)['num'],
 		'discount' => getPrice($dom)['disc'],
 		'priceStr' => getPrice($dom)['str'],
